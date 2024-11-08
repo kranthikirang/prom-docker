@@ -1,0 +1,63 @@
+version: '3'
+services:
+  prometheus: 
+    image: quay.io/prometheus/prometheus:v2.55.0 
+    container_name: prometheus
+    restart: "always"
+    environment: {}
+    volumes:
+      - ${PWD}/config/prometheus.yml:/etc/config/prometheus.yml
+      - ${PWD}/config/rules/:/etc/config/rules/
+      - ${PWD}/config/alerts/:/etc/config/alerts/
+      - ${PROMETHEUSDATA}:/data
+    command:
+      - --storage.tsdb.retention.time=15d
+      - --config.file=/etc/config/prometheus.yml
+      - --storage.tsdb.path=/data
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    ports:
+      - 9090:9090
+    extra_hosts:
+      - "tools-vm:192.168.2.115"
+    networks:
+      - prometheus
+
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:v0.27.0
+    container_name: alertmanager
+    restart: "always"
+    environment: {}
+    command:
+      - --storage.path=/alertmanager
+      - --config.file=/etc/alertmanager/alertmanager.yml
+    volumes:
+      - ${PWD}/config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ${ALERTMANAGERDATA}:/alertmanager
+    ports:
+      - 9093:9093
+    networks:
+      - prometheus
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: "always"
+    environment: {}
+    network_mode: host
+    pid: host
+    cap_add:
+      - SYS_TIME
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/host'
+      - '--path.udev.data=/host/root/run/udev/data'
+      - '--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+)($|/)'
+      - '--collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$'
+    volumes:
+      - '/:/host:ro,rslave'
+
+networks:
+  prometheus:
