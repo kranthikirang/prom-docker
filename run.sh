@@ -1,23 +1,23 @@
-export PROMETHEUSDATA=/root/prometheus/docker/prometheus-data
-export ALERTMANAGERDATA=/root/prometheus/docker/alertmanager-data
+export PROMETHEUSDATA=/home/ubuntu/prom-docker/prometheus-data
+export ALERTMANAGERDATA=/home/ubuntu/prom-docker/alertmanager-data
 
-if [[ ! -z $1 ]]; then
-	service=$1
-	if [[ $service == "prometheus" ]]; then
-		if [[ -z ${PROMETHEUSDATA} ]]; then
-			echo "Please set the PROMETHEUSDATA env variable for prometheus data"
-			exit
-		else
-			chown -R 65534:65534 ${PROMETHEUSDATA}
-		fi
-	elif [[ $service == "alertmanager" ]]; then
-		if [[ -z ${ALERTMANAGERDATA} ]]; then
-			echo "Please set the ALERTMANAGERDATA env variable for alertmanager data"
-			exit
-		else
-			chown -R 65534:65534 ${ALERTMANAGERDATA}
-		fi
+export EXTERNAL_NAME="talos-cp1"
+#export EXTERNAL_SCHEME="http"
+
+sudo chown -R 65534:65534 config && sudo chmod +x config/entrypoint.sh
+
+if [[ ! -z ${PROMETHEUSDATA} ]]; then
+	if [[ ! -d ${PROMETHEUSDATA} ]]; then
+		sudo mkdir -p ${PROMETHEUSDATA}
 	fi
+	sudo chown -R 65534:65534 ${PROMETHEUSDATA}
+fi
+
+if [[ ! -z ${ALERTMANAGERDATA} ]]; then
+	if [[ ! -d ${ALERTMANAGERDATA} ]]; then
+		sudo mkdir -p ${ALERTMANAGERDATA}
+	fi
+	sudo chown -R 65534:65534 ${ALERTMANAGERDATA}
 fi
 
 #docker compose down $service

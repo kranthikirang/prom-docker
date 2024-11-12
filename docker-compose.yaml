@@ -1,24 +1,43 @@
-version: '3'
+version: '2'
 services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.6.3
+    container_name: nginx-proxy
+    restart: "always"
+    environment:
+      - NO_COLOR=1
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ${PWD}/config/certs:/etc/nginx/certs
+    ports:
+      - 443:443
+      - 80:80
+    networks:
+      - prometheus
+
   prometheus: 
     image: quay.io/prometheus/prometheus:v2.55.0 
     container_name: prometheus
     restart: "always"
-    environment: {}
+    environment:
+      - ARG_COMMAND=/bin/prometheus
+      - ARG_PREFIX=PROM_
+      - PROM_WEB_EXTERNAL__URL=${EXTERNAL_SCHEME:-https}://${EXTERNAL_NAME}/prometheus
+      - PROM_CONFIG_FILE=/etc/config/prometheus.yml
+      - PROM_STORAGE_TSDB_PATH=/data
+      - PROM_WEB_CONSOLE_LIBRARIES=/etc/prometheus/console_libraries
+      - PROM_WEB_CONSOLE_TEMPLATES=/etc/prometheus/consoles
+      - PROM_STORAGE_TSDB_RETENTION_TIME=10d
+      - VIRTUAL_HOST=${EXTERNAL_NAME}
+      - VIRTUAL_PATH=/prometheus
+      - VIRTUAL_PORT=9090
     volumes:
+      - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PWD}/config/prometheus.yml:/etc/config/prometheus.yml
       - ${PWD}/config/rules/:/etc/config/rules/
       - ${PWD}/config/alerts/:/etc/config/alerts/
       - ${PROMETHEUSDATA}:/data
-    command:
-      - --storage.tsdb.retention.time=15d
-      - --config.file=/etc/config/prometheus.yml
-      - --storage.tsdb.path=/data
-      - --web.console.libraries=/etc/prometheus/console_libraries
-      - --web.console.templates=/etc/prometheus/consoles
-      - --web.enable-lifecycle
-    ports:
-      - 9090:9090
+    entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
     extra_hosts:
       - "tools-vm:192.168.2.115"
     networks:
@@ -28,15 +47,20 @@ services:
     image: quay.io/prometheus/alertmanager:v0.27.0
     container_name: alertmanager
     restart: "always"
-    environment: {}
-    command:
-      - --storage.path=/alertmanager
-      - --config.file=/etc/alertmanager/alertmanager.yml
+    environment:
+      - ARG_COMMAND=/bin/alertmanager
+      - ARG_PREFIX=PROM_
+      - PROM_WEB_EXTERNAL__URL=${EXTERNAL_SCHEME:-https}://${EXTERNAL_NAME}/alertmanager
+      - PROM_CONFIG_FILE=/etc/alertmanager/alertmanager.yml
+      - PROM_STORAGE_PATH=/alertmanager
+      - VIRTUAL_HOST=${EXTERNAL_NAME}
+      - VIRTUAL_PATH=/alertmanager
+      - VIRTUAL_PORT=9093
+    entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
     volumes:
+      - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PWD}/config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - ${ALERTMANAGERDATA}:/alertmanager
-    ports:
-      - 9093:9093
     networks:
       - prometheus
 
