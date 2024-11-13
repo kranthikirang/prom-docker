@@ -16,6 +16,11 @@
 * Update the label values in prometheus.json and alertmanager.json.
 * Update the node-exporter.json with other node-exporter targets and labels.
 
+## Enable SSL to nginx-proxy
+
+* Create a certs directory inside config directory.
+* Make sure certs directory contains the .crt and .key starting with the node fqdn name. For an exmaple if the nodename is foo.bar.com then the cert is going to be foo.bar.com.crt and key is going to be foo.bar.com.key
+
 ## RUN complete stack
 
 ```
