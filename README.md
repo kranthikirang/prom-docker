@@ -45,3 +45,7 @@
 ## Alertmanager Configuration
 
 Update alertmanager configuration in config/alertmanager/alertmanager.yml
+
+## Resource limits
+
+* Adjust the resource limits/reservations as per need in docker-compose.yaml
