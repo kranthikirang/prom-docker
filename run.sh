@@ -2,7 +2,7 @@ export PROMETHEUSDATA=/home/ubuntu/prom-docker/prometheus-data
 export ALERTMANAGERDATA=/home/ubuntu/prom-docker/alertmanager-data
 
 export EXTERNAL_NAME="talos-cp1"
-#export EXTERNAL_SCHEME="http"
+export EXTERNAL_SCHEME="http"
 
 sudo chown -R 65534:65534 config && sudo chmod +x config/entrypoint.sh
 

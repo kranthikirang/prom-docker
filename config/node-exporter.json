@@ -1,0 +1,10 @@
+[
+  {
+    "labels": {
+      "cluster": "talos-cluster"
+    },
+    "targets": [
+      "tools-vm:9100"
+    ]
+  }
+]

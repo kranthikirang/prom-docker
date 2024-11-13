@@ -1,0 +1,11 @@
+[
+  {
+    "labels": {
+      "cluster": "talos-cluster",
+      "__metrics_path__": "prometheus/metrics"
+    },
+    "targets": [
+      "prometheus:9090"
+    ]
+  }
+]

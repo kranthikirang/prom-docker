@@ -32,14 +32,12 @@ services:
       - VIRTUAL_PATH=/prometheus
       - VIRTUAL_PORT=9090
     volumes:
+      - ${PWD}/config/:/etc/config/
       - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
-      - ${PWD}/config/prometheus.yml:/etc/config/prometheus.yml
-      - ${PWD}/config/rules/:/etc/config/rules/
-      - ${PWD}/config/alerts/:/etc/config/alerts/
       - ${PROMETHEUSDATA}:/data
     entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
     extra_hosts:
-      - "tools-vm:192.168.2.115"
+      - "tools-vm:192.168.2.119"
     networks:
       - prometheus
 
