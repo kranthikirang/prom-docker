@@ -24,13 +24,20 @@
 ## RUN complete stack
 
 ```
-./run.sh
+./run-prometheus-stack.sh
+```
+
+## RUN prometheus/alertmanager alone
+
+```
+./run-prometheus-stack.sh prometheus
+./run-prometheus-stack.sh alertmanager
 ```
 
 ## RUN node-exporter alone
 
 ```
-./run.sh node-exporter
+./run-node-exporter.sh node-exporter
 ```
 
 **__NOTE__** To accmmodate prometheus docker user 65534 run.sh will modify user permissions to 65534:65534 which may appear as nobody:nogroup in the host when you run as regular user. User might have to use `sudo` while editing target json files in config directory.
