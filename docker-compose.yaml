@@ -36,8 +36,8 @@ services:
       - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PROMETHEUSDATA}:/data
     entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
-    extra_hosts:
-      - "tools-vm:192.168.2.119"
+    #extra_hosts:
+    #  - "tools-vm:192.168.2.119"
     networks:
       - prometheus
 

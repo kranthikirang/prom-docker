@@ -1,7 +1,8 @@
 [
   {
     "labels": {
-      "cluster": "talos-cluster"
+      "cluster": "talos-cluster",
+      "__metrics_path__": "/metrics"
     },
     "targets": [
       "tools-vm:9100"
