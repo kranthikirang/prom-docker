@@ -1,0 +1,30 @@
+version: '3'
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: "always"
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          cpus: '0.5'
+          memory: 100M
+    environment: {}
+    network_mode: host
+    pid: host
+    cap_add:
+      - SYS_TIME
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/host'
+      - '--path.udev.data=/host/root/run/udev/data'
+      - '--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+)($|/)'
+      - '--collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$'
+    volumes:
+      - '/:/host:ro,rslave'
+
+networks:
+  prometheus:

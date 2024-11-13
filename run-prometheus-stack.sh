@@ -30,4 +30,4 @@ if [[ ! -z ${ALERTMANAGERDATA} ]]; then
 fi
 
 #docker compose down $service
-docker compose up -d $service
+docker compose -f prometheus-stack-compose.yaml up -d $service
