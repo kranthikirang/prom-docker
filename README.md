@@ -42,9 +42,34 @@
 
 **__NOTE__** To accmmodate prometheus docker user 65534 run.sh will modify user permissions to 65534:65534 which may appear as nobody:nogroup in the host when you run as regular user. User might have to use `sudo` while editing target json files in config directory.
 
+**__NOTE__** Take a look into the extra_hosts parameter in prometheus-stack-compose.yaml to make prometheus to talk to the node-exporter if there is no DNS support.
+
+## Adding node-exporter targets
+
+* Update targets list in config/node-exporter.json file.
+
 ## Alertmanager Configuration
 
 Update alertmanager configuration in config/alertmanager/alertmanager.yml
+
+## Monitoring the docker daemon in the nodes
+
+* Update the /etc/docker/daemon.json with the following and restart the docker service.
+
+```
+{
+  "metrics-addr": "0.0.0.0:9323"
+}
+
+systemctl daemon-reload
+systemcl restart docker
+```
+
+**__NOTE__** You can use a reachable ip address instead of the 0.0.0.0 in daemon.json.
+
+## Adding the docker-exporter targets
+
+* Update targets list in config/docker-exporter.json file.
 
 ## Resource limits
 
