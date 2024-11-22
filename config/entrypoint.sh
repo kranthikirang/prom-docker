@@ -1,5 +1,6 @@
 #!/bin/sh -e
-
+set -x
+echo $@
 # Convert environment variables like PREFIX_A_B_C=123 to command line arguments like --a.b.c=123:
 args="$(env | grep "^$ARG_PREFIX" | awk -F= -v prefix=$ARG_PREFIX \
 '{

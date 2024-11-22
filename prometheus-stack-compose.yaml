@@ -49,9 +49,34 @@ services:
       - ${PWD}/config/:/etc/config/
       - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PROMETHEUSDATA}:/data
-    entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
+    entrypoint:
+      - /tmp/entrypoint.sh
+      - --web.enable-lifecycle
     #extra_hosts:
     #  - "tools-vm:192.168.2.119"
+    networks:
+      - prometheus
+
+  config-reloader:
+    image: quay.io/prometheus-operator/prometheus-config-reloader:v0.77.2
+    container_name: config-reloader
+    restart: "always"
+    command:
+      - --config-file=/etc/config/prometheus.yml
+      - --watched-dir=/etc/config
+      - --log-level=info
+      - --reload-url=http://prometheus:9090/prometheus/-/reload
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          cpus: '0.2'
+          memory: 50M
+    environment: {}
+    volumes:
+      - ${PWD}/config/:/etc/config/
+      - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
     networks:
       - prometheus
 
@@ -75,7 +100,8 @@ services:
       - VIRTUAL_HOST=${EXTERNAL_NAME}
       - VIRTUAL_PATH=/alertmanager
       - VIRTUAL_PORT=9093
-    entrypoint: ["/bin/sh", "-c", "/tmp/entrypoint.sh"]
+    entrypoint:
+      - /tmp/entrypoint.sh
     volumes:
       - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PWD}/config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
