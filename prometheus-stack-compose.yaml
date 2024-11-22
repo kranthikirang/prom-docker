@@ -57,9 +57,9 @@ services:
     networks:
       - prometheus
 
-  config-reloader:
+  prometheus-config-reloader:
     image: quay.io/prometheus-operator/prometheus-config-reloader:v0.77.2
-    container_name: config-reloader
+    container_name: prometheus-config-reloader
     restart: "always"
     command:
       - --config-file=/etc/config/prometheus.yml
@@ -106,6 +106,29 @@ services:
       - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
       - ${PWD}/config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - ${ALERTMANAGERDATA}:/alertmanager
+    networks:
+      - prometheus
+  
+  alertmanager-config-reloader:
+    image: quay.io/prometheus-operator/prometheus-config-reloader:v0.77.2
+    container_name: alertmanager-config-reloader
+    restart: "always"
+    command:
+      - --config-file=/etc/config/alertmanager/alertmanager.yml
+      - --watched-dir=/etc/config/alertmanager
+      - --log-level=info
+      - --reload-url=http://alertmanager:9093/alertmanager/-/reload
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          cpus: '0.2'
+          memory: 50M
+    environment: {}
+    volumes:
+      - ${PWD}/config/:/etc/config/
+      - ${PWD}/config/entrypoint.sh:/tmp/entrypoint.sh
     networks:
       - prometheus
 
