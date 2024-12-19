@@ -36,6 +36,16 @@ scrape_configs:
         action: replace
         target_label: nodename
   
+  - job_name: data-prepper
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    file_sd_configs:
+      - files:
+          - 'data-prepper.json'
+    basic_auth:
+      username: 'prepper'
+      password: 'prepper'
+  
   - job_name: docker 
     scrape_interval: 30s
     scrape_timeout: 10s
@@ -46,6 +56,20 @@ scrape_configs:
     relabel_configs:
       - source_labels: [__address__]
         regex: '(.*):9323'
+        replacement: ${1}
+        action: replace
+        target_label: nodename
+  
+  - job_name: kafka
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    file_sd_configs:
+      - files:
+          - 'kafka-exporter.json'
+        refresh_interval: 1m
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.*):(9308|9999)'
         replacement: ${1}
         action: replace
         target_label: nodename
